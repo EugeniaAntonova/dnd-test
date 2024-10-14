@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -23,24 +29,29 @@ body {
     padding: 28px 12px 0;
     display: flex;
     flex-direction: column;
+    justify-content: end;
     background-color: #EDF6FF;
 }
 
-.page>* {
-    flex-grow: 1;
+.shop {
+    display: grid;
+    grid-template-rows: 1fr 90px 140px;
+    align-content: end;
 }
 
 .shelfes {
     width: 211px;
+    height: fit-content;
     margin: 0 auto;
     display: grid;
     justify-items: center;
     align-items: stretch;
-    grid-template-rows: 103px 74px 74px 200px;
+    grid-template-rows: 103px 74px 74px 138px;
     position: relative;
     perspective: 1000px;
     transform-style: preserve-3d;
-    animation: showup .3s ease-in-out 1 forwards;
+
+    grid-area: 1 / 1 / 3 / -1;
 }
 
 .shelfes>* {
@@ -59,8 +70,7 @@ body {
 }
 
 .shelfes>*:not(.shelf:first-of-type) {
-    box-shadow: inset 0 0 var(--shadow-color);
-    animation: shadowAppear .3s ease var(--delay-shadow) 1 forwards;
+    box-shadow: inset 0 var(--shadow-y) var(--shadow-color);
 }
 
 .shelf {
@@ -82,21 +92,6 @@ body {
     transform-style: preserve-3d;
     transform-origin: center center 50px;
     transform: rotateX(85deg);
-
-    visibility: hidden;
-    animation: place .6s ease var(--delay-place) 1  forwards;
-}
-
-.shelf:nth-of-type(1) {
-    --delay-place: .5s;
-}
-.shelf:nth-of-type(2) {
-    --delay-place: .6s;
-    --delay-shadow: .9s;
-}
-.shelf:nth-of-type(3) {
-    --delay-place: .7s;
-    --delay-shadow: 1s;
 }
 
 .base__side {
@@ -130,8 +125,100 @@ body {
 .shelfes .bottom {
     --shadow-y: 64px;
     --shadow-color: #D35400;
-    --delay-shadow: 1.1s;
     background-color: #E67E22;
+}
+
+.checkout {
+    grid-area: 2 / 1 / -1 / -1;
+    z-index: 2;
+    display: grid;
+    grid-template-rows: 1fr 96px;
+    overflow: hidden;
+}
+
+.checkout__cart {
+    grid-area: 1 / -1;
+}
+
+.checkout__button {
+    place-self: center;
+    padding: 1.1em 1.2em;
+    color: #21201F;
+    font-weight: 500;
+    font-size: 1rem;
+    background-color: #FCE000;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .shelfes {
+        perspective: 1000px;
+        transform-style: preserve-3d;
+        animation: showup .3s ease-in-out 1 forwards;
+    }
+
+    .shelfes>*:not(.shelf:first-of-type) {
+        box-shadow: inset 0 0 var(--shadow-color);
+        animation: shadowAppear .3s ease var(--delay-shadow) 1 forwards;
+    }
+
+    .shelf {
+        perspective: 1000px;
+        perspective-origin: center -50px;
+        transform-style: preserve-3d;
+    }
+
+    .shelf__base {
+        transform-style: preserve-3d;
+        transform-origin: center center 50px;
+        transform: rotateX(85deg);
+
+        visibility: hidden;
+        animation: place .6s ease var(--delay-place) 1 forwards;
+    }
+
+    .shelf:nth-of-type(1) {
+        --delay-place: .5s;
+    }
+
+    .shelf:nth-of-type(2) {
+        --delay-place: .6s;
+        --delay-shadow: .8s;
+    }
+
+    .shelf:nth-of-type(3) {
+        --delay-place: .7s;
+        --delay-shadow: .9s;
+    }
+
+
+    .shelfes .bottom {
+        --shadow-y: 64px;
+        --shadow-color: #D35400;
+        --delay-shadow: 1s;
+        background-color: #E67E22;
+    }
+
+    .checkout__button {
+        transition: .3s ease-in-out;
+        transition-property: filter, scale, box-shadow;
+    }
+
+    @media (hover: hover) {
+        .checkout__button:where(:hover, :focus-visible) {
+            scale: 1.05;
+            filter: brightness(1.05);
+            box-shadow: 0 0 10px rgb(33, 32, 31, .5);
+        }
+    }
+
+    .checkout__button:active {
+        scale: .95;
+        filter: brightness(.95);
+        box-shadow: inset 0 0 10px rgb(33, 32, 31, .5);
+    }
 }
 
 @keyframes showup {
@@ -148,6 +235,7 @@ body {
     from {
         box-shadow: inset 0 0 var(--shadow-color);
     }
+
     to {
         box-shadow: inset 0 var(--shadow-y) var(--shadow-color);
     }
@@ -157,11 +245,13 @@ body {
     0% {
         visibility: hidden;
         translate: 100% 0 50px;
-    }    
+    }
+
     50% {
         visibility: visible;
         translate: 0 0 50px;
     }
+
     100% {
         visibility: visible;
         translate: 0 0 0;

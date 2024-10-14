@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./style.css">
-    <title>Shelf</title>
+    <title>Drag and drop shop</title>
 </head>
 <body>
     <main class="page">
-        <article class="shop">
-            <header>
-                <h1 class="visually-hidden">
-                    Drag and drop grocery shop
-                </h1>
-            </header>
+        <h1 class="visually-hidden">
+            Drag and drop grocery shop
+        </h1>
+        <section class="shop">
             <div class="shelfes">
                 <div class="shelf">
                     <div class="shelf__base">
@@ -36,10 +34,12 @@
                 <div class="bottom"></div>
             </div>
             <footer class="checkout">
-                <div class="checkout__cart"></div>
+                <div class="checkout__cart">
+                    <img src="./assets/cart.svg" alt="сюда складывать продукты">
+                </div>
                 <button type="button" class="checkout__button">Оплатить корзину</button>
             </footer>
-        </article>
+        </section>
     </main>
 </body>
 </html>
