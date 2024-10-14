@@ -59,11 +59,13 @@ body {
 }
 
 .shelfes>*:not(.shelf:first-of-type) {
-    box-shadow: inset 0 var(--shadow-y) rgba(0 0 0 / .40);
+    box-shadow: inset 0 0 var(--shadow-color);
+    animation: shadowAppear .3s ease var(--delay-shadow) 1 forwards;
 }
 
 .shelf {
     --shadow-y: 40px;
+    --shadow-color: #1D2A36;
     background-color: #34495E;
     position: relative;
     perspective: 1000px;
@@ -80,6 +82,21 @@ body {
     transform-style: preserve-3d;
     transform-origin: center center 50px;
     transform: rotateX(85deg);
+
+    visibility: hidden;
+    animation: place .6s ease var(--delay-place) 1  forwards;
+}
+
+.shelf:nth-of-type(1) {
+    --delay-place: .5s;
+}
+.shelf:nth-of-type(2) {
+    --delay-place: .6s;
+    --delay-shadow: .9s;
+}
+.shelf:nth-of-type(3) {
+    --delay-place: .7s;
+    --delay-shadow: 1s;
 }
 
 .base__side {
@@ -112,6 +129,8 @@ body {
 
 .shelfes .bottom {
     --shadow-y: 64px;
+    --shadow-color: #D35400;
+    --delay-shadow: 1.1s;
     background-color: #E67E22;
 }
 
@@ -122,5 +141,29 @@ body {
 
     to {
         translate: 0 0;
+    }
+}
+
+@keyframes shadowAppear {
+    from {
+        box-shadow: inset 0 0 var(--shadow-color);
+    }
+    to {
+        box-shadow: inset 0 var(--shadow-y) var(--shadow-color);
+    }
+}
+
+@keyframes place {
+    0% {
+        visibility: hidden;
+        translate: 100% 0 50px;
+    }    
+    50% {
+        visibility: visible;
+        translate: 0 0 50px;
+    }
+    100% {
+        visibility: visible;
+        translate: 0 0 0;
     }
 }
