@@ -37,6 +37,7 @@ body {
     display: grid;
     grid-template-rows: 1fr 90px 140px;
     align-content: end;
+    justify-content: center;
 }
 
 .shelfes {
@@ -86,9 +87,9 @@ body {
 .shelf__base {
     position: absolute;
     z-index: 2;
-    bottom: 10px;
+    bottom: 5px;
     width: 100%;
-    height: 75px;
+    height: 85px;
     transform-style: preserve-3d;
     transform-origin: center center 50px;
     transform: rotateX(85deg);
@@ -133,11 +134,12 @@ body {
     z-index: 2;
     display: grid;
     grid-template-rows: 1fr 96px;
-    overflow: hidden;
 }
 
 .checkout__cart {
-    grid-area: 1 / -1;
+    grid-row: 1 / -1;
+    grid-column: 1 / -1;
+    overflow: hidden;
 }
 
 .checkout__button {
@@ -150,6 +152,9 @@ body {
     border: none;
     border-radius: 16px;
     cursor: pointer;
+
+    grid-column: 1 / -1;
+    grid-row: 2 / -1;
 }
 
 @media (prefers-reduced-motion: no-preference) {

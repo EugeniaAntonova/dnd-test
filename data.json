@@ -1,0 +1,60 @@
+{
+    "data": [
+
+        {
+            "img": "wine.svg",
+            "name": "wine",
+            "width": 37
+        },
+        {
+            "img": "milk.svg",
+            "name": "milk",
+            "width": 37
+        },
+        {
+            "img": "jam.svg",
+            "name": "jam",
+            "width": 46
+        },
+        {
+            "img": "cheese.svg",
+            "name": "cheese",
+            "width": 37
+        },
+        {
+            "img": "beef.svg",
+            "name": "beef",
+            "width": 54
+        },
+        {
+            "img": "poultry.svg",
+            "name": "poultry",
+            "width": 66
+        },
+        {
+            "img": "crisps.svg",
+            "name": "crisps",
+            "width": 77
+        },
+        {
+            "img": "pineapple.svg",
+            "name": "pineapple",
+            "width": 35
+        },
+        {
+            "img": "bananas.svg",
+            "name": "bananas",
+            "width": 47
+        },
+        {
+            "img": "apple.svg",
+            "name": "apple",
+            "width": 31
+        },
+        {
+            "img": "lattuce.svg",
+            "name": "lattuce",
+            "width": 62
+        }
+    ]
+}
