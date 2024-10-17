@@ -202,17 +202,6 @@ body {
     pointer-events: none;
 }
 
-.draggable {
-    z-index: 3;
-}
-.checkout {
-    z-index: 1;
-}
-
-.shelfes {
-    z-index: 2;
-}
-
 @media (prefers-reduced-motion: no-preference) {
     .shelfes {
         perspective: 1000px;
