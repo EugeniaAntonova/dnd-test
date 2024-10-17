@@ -4,57 +4,68 @@
         {
             "img": "wine.svg",
             "name": "wine",
-            "width": 37
+            "width": 37,
+            "height": 125
         },
         {
             "img": "milk.svg",
             "name": "milk",
-            "width": 37
+            "width": 37,
+            "height": 91
         },
         {
             "img": "jam.svg",
             "name": "jam",
-            "width": 46
+            "width": 46,
+            "height": 42
         },
         {
             "img": "cheese.svg",
             "name": "cheese",
-            "width": 37
+            "width": 37,
+            "height": 35
         },
         {
             "img": "beef.svg",
             "name": "beef",
-            "width": 54
+            "width": 54,
+            "height": 54
         },
         {
             "img": "poultry.svg",
             "name": "poultry",
-            "width": 66
+            "width": 66,
+            "height": 63
         },
         {
             "img": "crisps.svg",
             "name": "crisps",
-            "width": 77
+            "width": 77,
+            "height": 47
         },
         {
             "img": "pineapple.svg",
             "name": "pineapple",
-            "width": 35
+            "width": 35,
+            "height": 75
         },
         {
             "img": "bananas.svg",
             "name": "bananas",
-            "width": 47
+            "width": 47,
+            "height": 48
         },
         {
             "img": "apple.svg",
             "name": "apple",
-            "width": 31
+            "width": 31,
+            "height": 36
         },
         {
             "img": "lattuce.svg",
             "name": "lattuce",
-            "width": 62
+            "width": 62,
+            "height": 51
         }
     ]
 }

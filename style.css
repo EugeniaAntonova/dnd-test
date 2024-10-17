@@ -4,6 +4,10 @@
     box-sizing: border-box;
 }
 
+* {
+    user-select: none;
+}
+
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -20,6 +24,9 @@
 
 body {
     margin: 0;
+    height: fit-content;
+    min-height: 100vh;
+    min-height: 100svh;
 }
 
 .page {
@@ -34,6 +41,9 @@ body {
 }
 
 .shop {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
     display: grid;
     grid-template-rows: 1fr 90px 140px;
     align-content: end;
@@ -41,14 +51,19 @@ body {
 }
 
 .shelfes {
-    width: 211px;
-    height: fit-content;
+    width: 72vw;
+    max-width: 300px;
+    min-height: 350px;
+    height: 71vh;
+    height: 71svh;
+    max-height: 600px;
     margin: 0 auto;
     display: grid;
     justify-items: center;
     align-items: stretch;
-    grid-template-rows: 103px 74px 74px 138px;
+    grid-template-rows: 17fr 12fr 12fr 23fr;
     position: relative;
+    z-index: 2;
     perspective: 1000px;
     transform-style: preserve-3d;
 
@@ -56,7 +71,7 @@ body {
 }
 
 .shelfes>* {
-    width: 198px;
+    width: 94%;
     margin-top: -1px;
 }
 
@@ -65,9 +80,10 @@ body {
     position: absolute;
     top: -2px;
     z-index: 2;
-    width: 211px;
-    height: 60px;
+    width: 100%;
+    aspect-ratio: 35 / 10;
     background: url('./assets/top.svg') 50% 50% no-repeat;
+    background-size: cover;
 }
 
 .shelfes>*:not(.shelf:first-of-type) {
@@ -157,6 +173,46 @@ body {
     grid-row: 2 / -1;
 }
 
+.checkout__cart.empty + .checkout__button {
+    pointer-events: none;
+    visibility: hidden;
+    scale: 0;
+}
+
+.draggable {
+    --top: 0;
+    --left:0;
+    width: fit-content;
+    position: absolute;
+    z-index: 3;
+    left: var(--left);
+    top: var(--top);
+
+    cursor: grab;
+}
+
+.draggable.is-dragging {
+    z-index: 10;
+    cursor: grabbing;
+    scale: 1.1;
+    filter: brightness(1.1);
+}
+
+.draggable img {
+    pointer-events: none;
+}
+
+.draggable {
+    z-index: 3;
+}
+.checkout {
+    z-index: 1;
+}
+
+.shelfes {
+    z-index: 2;
+}
+
 @media (prefers-reduced-motion: no-preference) {
     .shelfes {
         perspective: 1000px;
@@ -206,6 +262,14 @@ body {
         background-color: #E67E22;
     }
 
+    .checkout__cart {
+        --starting-offset: -100%;
+        --roll-in-time: 0.4s;
+        opacity: 0;
+        translate: -100%;
+        animation: rollIn var(--roll-in-time) ease-out 2.9s 1 forwards;
+    }
+
     .checkout__button {
         transition: .3s ease-in-out;
         transition-property: filter, scale, box-shadow;
@@ -224,6 +288,16 @@ body {
         filter: brightness(.95);
         box-shadow: inset 0 0 10px rgb(33, 32, 31, .5);
     }
+
+    .draggable {
+        --left: 0;
+        --top: 0;
+        --delay: 1.4s;
+        left: -100px;
+        top: -100px;
+        animation: flyToPlace .4s ease-in-out var(--delay) 1 forwards;
+    }
+
 }
 
 @keyframes showup {
@@ -260,5 +334,87 @@ body {
     100% {
         visibility: visible;
         translate: 0 0 0;
+    }
+}
+
+@keyframes flyToPlace {
+    from {
+        left: -100px;
+        top: -100px;
+    }
+
+    to {
+        left: var(--left);
+        top: var(--top);
+    }
+}
+
+@keyframes rollIn {
+    0% {
+        opacity: 0;
+        translate: var(--starting-offset) 0;
+    }
+
+    25% {
+        opacity: 1;
+        translate: -75% 0;
+    }
+
+    100% {
+        opacity: 1;
+        translate: 0 0;
+    }
+}
+
+
+@media (min-width: 800px) {
+
+    .page {
+        justify-content: center;
+    }
+
+    .shop {
+        grid-template-rows: 1fr 60px;
+        gap: 16px;
+        grid-template-columns: 1fr 1fr;
+        align-content: end;
+        justify-content: center;
+    }
+
+    .shelfes {
+        grid-area: 1 / 1 / 2 / 2;
+        z-index: 2;
+    }
+
+    .shelf {
+        --shadow-y: 60px;
+    }
+
+    .shelfes .bottom {
+        --shadow-y: 84px;
+    }
+
+    .checkout {
+        z-index: 1;
+        grid-area: 1 / 1 / -1 / -1;
+        z-index: 2;
+        display: flex;
+        flex-flow: row-reverse;
+        align-items: end;
+    }
+
+    .checkout__cart {
+        --starting-offset: -200%;
+        --roll-in-time: .8s;
+        display: grid;
+        place-content: center;
+    }
+
+    .checkout__button {
+        margin-top: auto;
+    }
+
+    .draggable {
+        z-index: 3;
     }
 }
