@@ -103,13 +103,58 @@ class DragAndDrop {
         currentDraggingElement: null,
     }
 
+    touchCoords = {
+        x: 0,
+        y: 0
+    };
+
     constructor() {
         this.state = { ...this.initialState };
-        this.bindEvents();
+        this.isMobile = this.isItMobileDevice();
+        this.bindEvents(this.isMobile);
     }
 
     resetState() {
         this.state = { ...this.initialState };
+    }
+
+    onTouchStart(evt) {
+        const {target} = evt;
+        const isDraggable = target.matches(this.selectors.root);
+        if (!isDraggable) return;
+
+        evt.target.classList.add(this.stateClasses.isDragging);
+        const { left, top } = target.getBoundingClientRect();
+
+        const firstTouch = evt.touches[0];
+        this.touchCoords.x = firstTouch.clientX;
+        this.touchCoords.y = firstTouch.clientY;
+
+        this.state = {
+            offsetX: firstTouch.clientX - left,
+            offsetY: firstTouch.clientY - top,
+            isDragging: true,
+            currentDraggingElement: target
+        }
+    }
+
+    onTouchMove(evt) {
+        if (!this.state.isDragging) return;
+
+        const x = evt.touches[0].clientX - this.state.offsetX;
+        const y = evt.touches[0].clientY - this.state.offsetY;
+        
+        requestAnimationFrame(() => {
+            this.state.currentDraggingElement.style.setProperty('--left', `${x}px`);
+            this.state.currentDraggingElement.style.setProperty('--top', `${y}px`);
+        });
+    }
+
+    onTouchEnd() {
+        if (!this.state.isDragging) return;
+
+        this.state.currentDraggingElement.classList.remove('is-dragging');
+        this.resetState()
     }
 
     onPointerDown(evt) {
@@ -125,7 +170,6 @@ class DragAndDrop {
             isDragging: true,
             currentDraggingElement: target
         }
-        console.log(this.state);
     }
 
     onPointerMove(evt) {
@@ -147,7 +191,26 @@ class DragAndDrop {
         this.resetState()
     }
 
-    bindEvents() {
+    isItMobileDevice() {
+        const reMobiles = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Touch|pixel/i;
+        const reMac = /Macintosh/i;
+        const agent = navigator.userAgent;
+
+        const isMobile = reMobiles.test(agent);
+        const isBigIpad = reMac.test(agent) && navigator.maxTouchPoints > 0;
+        const isSmall = Math.max(window.innerHeight, window.innerWidth) <= 1600 && navigator.maxTouchPoints > 0;
+        const hasCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+
+        return isMobile || isBigIpad || isSmall || hasCoarsePointer;
+    };
+
+    bindEvents(isMobile) {
+        if (isMobile) {
+            document.addEventListener('touchstart', (evt) => this.onTouchStart(evt));
+            document.addEventListener('touchmove', (evt) => this.onTouchMove(evt));
+            document.addEventListener('touchend', () => this.onTouchEnd());
+            return;
+        }
         document.addEventListener('pointerdown', (evt) => this.onPointerDown(evt));
         document.addEventListener('pointermove', (evt) => this.onPointerMove(evt));
         document.addEventListener('pointerup', () => this.onPointerUp());
@@ -156,3 +219,39 @@ class DragAndDrop {
 
 new ProductsCreator();
 new DragAndDrop();
+
+// const touchCoords = {
+//     x: 0,
+//     y: 0
+// };
+
+
+// document.addEventListener('touchstart', (evt) => {
+//     if (!evt.target.classList.contains('draggable')) return;
+//     const firstTouch = evt.touches[0];
+//     touchCoords.x = firstTouch.clientX;
+//     touchCoords.y = firstTouch.clientY;
+
+//     document.addEventListener('touchmove', handleTouchMove);
+// })
+
+// document.addEventListener('touchend', () => {
+//     document.removeEventListener('touchmove', handleTouchMove);
+// })
+
+// function onTouchMove(evt) {
+//     console.log('move', evt);
+// }
+
+// function handleTouchMove(event) {
+//     if (!touchCoords.x || !touchCoords.y) {
+//         return;
+//     }
+
+//     const { x, y } = touchCoords;
+
+//     // Сохраняем текущие координаты
+//     const xUp = event.touches[0].clientX;
+//     const yUp = event.touches[0].clientY;
+//     console.log({ xUp, yUp });
+// }
