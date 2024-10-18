@@ -103,10 +103,10 @@ class DragAndDrop {
         currentDraggingElement: null,
     }
 
-    touchCoords = {
-        x: 0,
-        y: 0
-    };
+    startingPosition = {
+        startingX: 0,
+        startingY: 0,
+    }
 
     constructor() {
         this.state = { ...this.initialState };
@@ -115,6 +115,8 @@ class DragAndDrop {
     }
 
     resetState() {
+        this.state.currentDraggingElement.style.setProperty('--left', `${this.startingPosition.startingX}`);
+        this.state.currentDraggingElement.style.setProperty('--top', `${this.startingPosition.startingY}`);
         this.state = { ...this.initialState };
     }
 
@@ -127,8 +129,6 @@ class DragAndDrop {
         const { left, top } = target.getBoundingClientRect();
 
         const firstTouch = evt.touches[0];
-        this.touchCoords.x = firstTouch.clientX;
-        this.touchCoords.y = firstTouch.clientY;
 
         this.state = {
             offsetX: firstTouch.clientX - left,
@@ -136,6 +136,10 @@ class DragAndDrop {
             isDragging: true,
             currentDraggingElement: target
         }
+
+        this.startingPosition.startingX =  window.getComputedStyle(target).left;
+        this.startingPosition.startingY = window.getComputedStyle(target).top;
+        console.log(this.startingPosition);
     }
 
     onTouchMove(evt) {
