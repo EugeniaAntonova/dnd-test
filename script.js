@@ -112,11 +112,17 @@ class DragAndDrop {
         this.state = { ...this.initialState };
         this.isMobile = this.isItMobileDevice();
         this.bindEvents(this.isMobile);
+        this.maxWidth = window.innerWidth;
+        this.maxHeight = window.innerHeight;
+    }
+
+    putItemBack() {
+        this.state.currentDraggingElement.style.setProperty('--left', `${this.startingPosition.startingX}`);
+        this.state.currentDraggingElement.style.setProperty('--top', `${this.startingPosition.startingY}`);
     }
 
     resetState() {
-        this.state.currentDraggingElement.style.setProperty('--left', `${this.startingPosition.startingX}`);
-        this.state.currentDraggingElement.style.setProperty('--top', `${this.startingPosition.startingY}`);
+        this.putItemBack();
         this.state = { ...this.initialState };
     }
 
@@ -127,6 +133,7 @@ class DragAndDrop {
 
         evt.target.classList.add(this.stateClasses.isDragging);
         const { left, top } = target.getBoundingClientRect();
+        const { height, width } = target.getBoundingClientRect();
 
         const firstTouch = evt.touches[0];
 
@@ -134,19 +141,26 @@ class DragAndDrop {
             offsetX: firstTouch.clientX - left,
             offsetY: firstTouch.clientY - top,
             isDragging: true,
-            currentDraggingElement: target
+            currentDraggingElement: target,
+            width: width,
+            height: height
         }
 
         this.startingPosition.startingX =  window.getComputedStyle(target).left;
         this.startingPosition.startingY = window.getComputedStyle(target).top;
-        console.log(this.startingPosition);
     }
 
     onTouchMove(evt) {
+        evt.preventDefault();
         if (!this.state.isDragging) return;
 
-        const x = evt.touches[0].clientX - this.state.offsetX;
-        const y = evt.touches[0].clientY - this.state.offsetY;
+        let x = evt.touches[0].clientX - this.state.offsetX;
+        let y = evt.touches[0].clientY - this.state.offsetY;
+
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+        if (x + this.state.width > this.maxWidth) x = this.maxWidth - this.state.width;
+        if (y + this.state.height > this.maxHeight) y = this.maxHeight - this.state.height;
         
         requestAnimationFrame(() => {
             this.state.currentDraggingElement.style.setProperty('--left', `${x}px`);
@@ -162,25 +176,35 @@ class DragAndDrop {
     }
 
     onPointerDown(evt) {
-        const { target, x, y } = evt;
+        let { target, x, y } = evt;
         const isDraggable = target.matches(this.selectors.root);
         if (!isDraggable) return;
 
         evt.target.classList.add(this.stateClasses.isDragging);
         const { left, top } = target.getBoundingClientRect();
+        const { height, width } = target.getBoundingClientRect();
         this.state = {
             offsetX: x - left,
             offsetY: y - top,
             isDragging: true,
-            currentDraggingElement: target
+            currentDraggingElement: target,
+            width: width,
+            height: height
         }
+
+        this.startingPosition.startingX =  window.getComputedStyle(target).left;
+        this.startingPosition.startingY = window.getComputedStyle(target).top;
     }
 
     onPointerMove(evt) {
         if (!this.state.isDragging) return;
 
-        const x = evt.pageX - this.state.offsetX;
-        const y = evt.pageY - this.state.offsetY;
+        let x = evt.pageX - this.state.offsetX;
+        let y = evt.pageY - this.state.offsetY;
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+        if (x > this.maxWidth) x = this.maxWidth - this.state.width;
+        if (y > this.maxHeight) y = this.maxHeight - this.state.height;
 
         requestAnimationFrame(() => {
             this.state.currentDraggingElement.style.setProperty('--left', `${x}px`);
