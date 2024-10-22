@@ -1,3 +1,47 @@
+function animate({ timing, draw, duration }) {
+    return new Promise(resolve => {
+        let start = performance.now();
+
+        requestAnimationFrame(function animate(time) {
+            let timeFraction = (time - start) / duration;
+            if (timeFraction > 1) timeFraction = 1;
+
+            let progress = timing(timeFraction);
+
+            draw(progress);
+
+            if (timeFraction < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                resolve();
+            }
+        })
+    });
+}
+
+function makeEaseOut(timing) {
+    return function (timeFraction) {
+        return 1 - timing(1 - timeFraction);
+    };
+}
+
+function bounce(timeFraction) {
+    for (let a = 0, b = 1; 1; a += b, b /= 2) {
+        if (timeFraction >= (7 - 4 * a) / 11) {
+            return (
+                -Math.pow((11 - 6 * a - 11 * timeFraction) / 4, 2) + Math.pow(b, 2)
+            );
+        }
+    }
+}
+
+function quad(timeFraction) {
+    return Math.pow(timeFraction, 2)
+}
+
+let bounceEaseOut = makeEaseOut(bounce);
+let quadEaseOut = makeEaseOut(quad);
+
 class ProductsCreator {
     constructor() {
         this.getData(this.onDataSuccess, this.onDataFail);
@@ -89,16 +133,21 @@ class ProductsCreator {
 
 class DragAndDrop {
     selectors = {
-        root: '[data-product-dnd]',
+        product: '[data-product-dnd]',
+        cart: '[data-cart]'
     }
 
     stateClasses = {
         isDragging: 'is-dragging',
+        isInCart: 'is-in-cart',
+        isFlyingBack: 'fly-back'
     }
 
     initialState = {
         offsetX: null,
         offsetY: null,
+        x: null,
+        y: null,
         isDragging: false,
         currentDraggingElement: null,
     }
@@ -114,21 +163,47 @@ class DragAndDrop {
         this.bindEvents(this.isMobile);
         this.maxWidth = window.innerWidth;
         this.maxHeight = window.innerHeight;
+
+        this.cart = document.querySelector(this.selectors.cart);
+
+        window.addEventListener('resize', () => this.onWindowResize());
     }
 
     putItemBack() {
-        this.state.currentDraggingElement.style.setProperty('--left', `${this.startingPosition.startingX}`);
-        this.state.currentDraggingElement.style.setProperty('--top', `${this.startingPosition.startingY}`);
+        let product = this.state.currentDraggingElement;
+        let curentX = parseFloat(this.state.x);
+        let curentY = parseFloat(this.state.y);
+
+        let delX = curentX - parseFloat(this.startingPosition.startingX);
+        let delY = curentY - parseFloat(this.startingPosition.startingY);
+
+        function animateProduct(product) {
+            return animate({
+                duration: 300,
+                timing: quadEaseOut,
+                draw: function (progress) {
+                    product.style.setProperty('--left', `${curentX - delX * progress}px`);
+                    product.style.setProperty('--top', `${curentY - delY * progress}px`);
+                }
+            });
+        }
+        animateProduct(product);
     }
 
     resetState() {
-        this.putItemBack();
+        if (!this.state.currentDraggingElement.classList.contains(this.stateClasses.isInCart)) {
+            this.putItemBack();
+        }
         this.state = { ...this.initialState };
     }
 
+    placeItemInCart() {
+
+    }
+
     onTouchStart(evt) {
-        const {target} = evt;
-        const isDraggable = target.matches(this.selectors.root);
+        const { target } = evt;
+        const isDraggable = target.matches(this.selectors.product);
         if (!isDraggable) return;
 
         evt.target.classList.add(this.stateClasses.isDragging);
@@ -146,13 +221,15 @@ class DragAndDrop {
             height: height
         }
 
-        this.startingPosition.startingX =  window.getComputedStyle(target).left;
+        this.startingPosition.startingX = window.getComputedStyle(target).left;
         this.startingPosition.startingY = window.getComputedStyle(target).top;
     }
 
     onTouchMove(evt) {
-        evt.preventDefault();
         if (!this.state.isDragging) return;
+        evt.preventDefault();
+
+        let target = this.state.currentDraggingElement;
 
         let x = evt.touches[0].clientX - this.state.offsetX;
         let y = evt.touches[0].clientY - this.state.offsetY;
@@ -161,10 +238,12 @@ class DragAndDrop {
         if (y < 0) y = 0;
         if (x + this.state.width > this.maxWidth) x = this.maxWidth - this.state.width;
         if (y + this.state.height > this.maxHeight) y = this.maxHeight - this.state.height;
-        
+        this.state.x = x;
+        this.state.y = y;
+
         requestAnimationFrame(() => {
-            this.state.currentDraggingElement.style.setProperty('--left', `${x}px`);
-            this.state.currentDraggingElement.style.setProperty('--top', `${y}px`);
+            target.style.setProperty('--left', `${x}px`);
+            target.style.setProperty('--top', `${y}px`);
         });
     }
 
@@ -177,10 +256,9 @@ class DragAndDrop {
 
     onPointerDown(evt) {
         let { target, x, y } = evt;
-        const isDraggable = target.matches(this.selectors.root);
+        const isDraggable = target.matches(this.selectors.product);
         if (!isDraggable) return;
-
-        evt.target.classList.add(this.stateClasses.isDragging);
+        target.classList.add(this.stateClasses.isDragging);
         const { left, top } = target.getBoundingClientRect();
         const { height, width } = target.getBoundingClientRect();
         this.state = {
@@ -192,12 +270,14 @@ class DragAndDrop {
             height: height
         }
 
-        this.startingPosition.startingX =  window.getComputedStyle(target).left;
+        this.startingPosition.startingX = window.getComputedStyle(target).left;
         this.startingPosition.startingY = window.getComputedStyle(target).top;
     }
 
     onPointerMove(evt) {
         if (!this.state.isDragging) return;
+
+        const target = this.state.currentDraggingElement;
 
         let x = evt.pageX - this.state.offsetX;
         let y = evt.pageY - this.state.offsetY;
@@ -206,9 +286,12 @@ class DragAndDrop {
         if (x > this.maxWidth) x = this.maxWidth - this.state.width;
         if (y > this.maxHeight) y = this.maxHeight - this.state.height;
 
+        this.state.x = x;
+        this.state.y = y;
+
         requestAnimationFrame(() => {
-            this.state.currentDraggingElement.style.setProperty('--left', `${x}px`);
-            this.state.currentDraggingElement.style.setProperty('--top', `${y}px`);
+            target.style.setProperty('--left', `${x}px`);
+            target.style.setProperty('--top', `${y}px`);
         });
     }
 
@@ -232,10 +315,18 @@ class DragAndDrop {
         return isMobile || isBigIpad || isSmall || hasCoarsePointer;
     };
 
+    onWindowResize() {
+        this.state = { ...this.initialState };
+        this.isMobile = this.isItMobileDevice();
+        this.bindEvents(this.isMobile);
+        this.maxWidth = window.innerWidth;
+        this.maxHeight = window.innerHeight;
+    }
+
     bindEvents(isMobile) {
         if (isMobile) {
             document.addEventListener('touchstart', (evt) => this.onTouchStart(evt));
-            document.addEventListener('touchmove', (evt) => this.onTouchMove(evt));
+            document.addEventListener('touchmove', (evt) => this.onTouchMove(evt), { passive: false });
             document.addEventListener('touchend', () => this.onTouchEnd());
             return;
         }
@@ -247,39 +338,3 @@ class DragAndDrop {
 
 new ProductsCreator();
 new DragAndDrop();
-
-// const touchCoords = {
-//     x: 0,
-//     y: 0
-// };
-
-
-// document.addEventListener('touchstart', (evt) => {
-//     if (!evt.target.classList.contains('draggable')) return;
-//     const firstTouch = evt.touches[0];
-//     touchCoords.x = firstTouch.clientX;
-//     touchCoords.y = firstTouch.clientY;
-
-//     document.addEventListener('touchmove', handleTouchMove);
-// })
-
-// document.addEventListener('touchend', () => {
-//     document.removeEventListener('touchmove', handleTouchMove);
-// })
-
-// function onTouchMove(evt) {
-//     console.log('move', evt);
-// }
-
-// function handleTouchMove(event) {
-//     if (!touchCoords.x || !touchCoords.y) {
-//         return;
-//     }
-
-//     const { x, y } = touchCoords;
-
-//     // Сохраняем текущие координаты
-//     const xUp = event.touches[0].clientX;
-//     const yUp = event.touches[0].clientY;
-//     console.log({ xUp, yUp });
-// }

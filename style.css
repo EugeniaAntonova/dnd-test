@@ -156,7 +156,16 @@ body {
 .checkout__cart {
     grid-row: 1 / -1;
     grid-column: 1 / -1;
+    position: relative;
     overflow: hidden;
+}
+
+.cart__space {
+    position: absolute;
+    top: 0;
+    left: 64px;
+    right: 48px;
+    bottom: 48px;
 }
 
 .checkout__button {
@@ -174,7 +183,7 @@ body {
     grid-row: 2 / -1;
 }
 
-.checkout__cart.empty + .checkout__button {
+.checkout__cart.empty+.checkout__button {
     pointer-events: none;
     visibility: hidden;
     scale: 0;
@@ -182,7 +191,7 @@ body {
 
 .draggable {
     --top: 0;
-    --left:0;
+    --left: 0;
     width: fit-content;
     position: absolute;
     z-index: 3;
@@ -287,7 +296,6 @@ body {
         top: -100px;
         animation: flyToPlace .4s ease-in-out var(--delay) 1 forwards;
     }
-
 }
 
 @keyframes showup {
@@ -356,7 +364,6 @@ body {
     }
 }
 
-
 @media (min-width: 800px) {
 
     .page {
@@ -398,6 +405,11 @@ body {
         --roll-in-time: .8s;
         display: grid;
         place-content: center;
+    }
+
+    .cart__space {
+        right: 24px;
+        bottom: 148px;
     }
 
     .checkout__button {
