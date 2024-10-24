@@ -64,7 +64,6 @@ body {
     align-items: stretch;
     grid-template-rows: 17fr 12fr 12fr 23fr;
     position: relative;
-    z-index: 2;
     perspective: 1000px;
     transform-style: preserve-3d;
 
@@ -92,7 +91,7 @@ body {
 }
 
 .shelf {
-    --shadow-y: 40px;
+    --shadow-y: 50px;
     --shadow-color: #1D2A36;
     background-color: #34495E;
     position: relative;
@@ -148,7 +147,7 @@ body {
 
 .checkout {
     grid-area: 2 / 1 / -1 / -1;
-    z-index: 2;
+    z-index: 4;
     display: grid;
     grid-template-rows: 1fr 96px;
 }
@@ -166,6 +165,7 @@ body {
     left: 64px;
     right: 48px;
     bottom: 48px;
+    pointer-events: all;
 }
 
 .checkout__button {
@@ -181,6 +181,7 @@ body {
 
     grid-column: 1 / -1;
     grid-row: 2 / -1;
+    z-index: 2;
 }
 
 .checkout__cart.empty+.checkout__button {
@@ -194,7 +195,7 @@ body {
     --left: 0;
     width: fit-content;
     position: absolute;
-    z-index: 3;
+    z-index: 2;
     left: var(--left);
     top: var(--top);
 
@@ -202,7 +203,7 @@ body {
 }
 
 .draggable.is-dragging {
-    z-index: 10;
+    z-index: 3;
     cursor: grabbing;
     scale: 1.1;
     filter: brightness(1.1);
@@ -255,7 +256,7 @@ body {
 
 
     .shelfes .bottom {
-        --shadow-y: 64px;
+        --shadow-y: 84px;
         --shadow-color: #D35400;
         --delay-shadow: 1s;
         background-color: #E67E22;
@@ -380,7 +381,6 @@ body {
 
     .shelfes {
         grid-area: 1 / 1 / 2 / 2;
-        z-index: 2;
     }
 
     .shelf {
@@ -388,16 +388,15 @@ body {
     }
 
     .shelfes .bottom {
-        --shadow-y: 84px;
+        --shadow-y: 86px;
     }
 
     .checkout {
-        z-index: 1;
         grid-area: 1 / 1 / -1 / -1;
-        z-index: 2;
         display: flex;
         flex-flow: row-reverse;
         align-items: end;
+        pointer-events: none;
     }
 
     .checkout__cart {
@@ -413,10 +412,7 @@ body {
     }
 
     .checkout__button {
+        pointer-events: all;
         margin-top: auto;
-    }
-
-    .draggable {
-        z-index: 3;
     }
 }

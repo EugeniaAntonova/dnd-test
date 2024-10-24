@@ -103,7 +103,7 @@ class ProductsCreator {
         this.positionProduct();
         this.products.forEach((product, index) => {
             product.style.setProperty('--delay', `${this.constants.animationDelay + index / 10}s`);
-            document.body.append(product);
+            document.body.querySelector('.shop').append(product);
         });
         window.addEventListener('resize', () => this.positionProduct())
     }
@@ -134,13 +134,13 @@ class ProductsCreator {
 class DragAndDrop {
     selectors = {
         product: '[data-product-dnd]',
-        cart: '[data-cart]'
+        cart: '.js-cart-space',
+        cartContainer: '.js-cart-container'
     }
 
     stateClasses = {
         isDragging: 'is-dragging',
         isInCart: 'is-in-cart',
-        isFlyingBack: 'fly-back'
     }
 
     initialState = {
@@ -164,9 +164,45 @@ class DragAndDrop {
         this.maxWidth = window.innerWidth;
         this.maxHeight = window.innerHeight;
 
-        this.cart = document.querySelector(this.selectors.cart);
-
+        this.cartCoords = {};
+        this.getCartPosition();
+        console.log(this.cartCoords);
         window.addEventListener('resize', () => this.onWindowResize());
+    }
+
+    getCartPosition() {
+        const checkoutCart = document.querySelector(this.selectors.cartContainer);
+        const cartSpace = document.querySelector(this.selectors.cart);
+
+        function getCoords() {
+            let cartSpaceCoords = cartSpace.getBoundingClientRect();
+            let left = cartSpaceCoords.x;
+            let right = left + cartSpaceCoords.width;
+            let top = cartSpaceCoords.y;
+            let bottom = top + cartSpaceCoords.height;
+
+            return {left, right, top, bottom};
+        }
+
+        let isAnimated = window.getComputedStyle(checkoutCart).animation.split(' ')[0] !== 'none';
+
+        function animationEnd() {
+            return new Promise((resolve) => {
+                checkoutCart.addEventListener('animationend', resolve);
+            })
+        }
+
+        if (isAnimated) {
+            let coords = {};
+            animationEnd()
+            .then(() => {coords = getCoords()})
+            .then(() => {this.cartCoords = {...coords};})
+            .then(() => console.log(this.cartCoords));
+
+            return;
+        }
+
+        this.cartCoords = getCoords();
     }
 
     putItemBack() {
@@ -321,6 +357,7 @@ class DragAndDrop {
         this.bindEvents(this.isMobile);
         this.maxWidth = window.innerWidth;
         this.maxHeight = window.innerHeight;
+        this.getCartPosition();
     }
 
     bindEvents(isMobile) {
@@ -328,11 +365,11 @@ class DragAndDrop {
             document.addEventListener('touchstart', (evt) => this.onTouchStart(evt));
             document.addEventListener('touchmove', (evt) => this.onTouchMove(evt), { passive: false });
             document.addEventListener('touchend', () => this.onTouchEnd());
-            return;
+        } else {
+            document.addEventListener('pointerdown', (evt) => this.onPointerDown(evt));
+            document.addEventListener('pointermove', (evt) => this.onPointerMove(evt));
+            document.addEventListener('pointerup', () => this.onPointerUp());
         }
-        document.addEventListener('pointerdown', (evt) => this.onPointerDown(evt));
-        document.addEventListener('pointermove', (evt) => this.onPointerMove(evt));
-        document.addEventListener('pointerup', () => this.onPointerUp());
     }
 }
 
