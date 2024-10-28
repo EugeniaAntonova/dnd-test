@@ -165,12 +165,11 @@ class DragAndDrop {
         this.maxHeight = window.innerHeight;
 
         this.cartCoords = {};
-        this.getCartPosition();
-        console.log(this.cartCoords);
+        this.getCartPosition(true);
         window.addEventListener('resize', () => this.onWindowResize());
     }
 
-    getCartPosition() {
+    getCartPosition(init) {
         const checkoutCart = document.querySelector(this.selectors.cartContainer);
         const cartSpace = document.querySelector(this.selectors.cart);
 
@@ -181,25 +180,28 @@ class DragAndDrop {
             let top = cartSpaceCoords.y;
             let bottom = top + cartSpaceCoords.height;
 
-            return {left, right, top, bottom};
+            return { left, right, top, bottom };
         }
 
-        let isAnimated = window.getComputedStyle(checkoutCart).animation.split(' ')[0] !== 'none';
+        if (init) {
+            let isAnimated = window.getComputedStyle(checkoutCart).animation.split(' ')[0] !== 'none';
 
-        function animationEnd() {
-            return new Promise((resolve) => {
-                checkoutCart.addEventListener('animationend', resolve);
-            })
-        }
+            function animationEnd() {
+                return new Promise((resolve) => {
+                    checkoutCart.addEventListener('animationend', resolve);
+                })
+            }
 
-        if (isAnimated) {
-            let coords = {};
-            animationEnd()
-            .then(() => {coords = getCoords()})
-            .then(() => {this.cartCoords = {...coords};})
-            .then(() => console.log(this.cartCoords));
+            if (isAnimated) {
+                let coords = {};
+                animationEnd()
+                    .then(() => { coords = getCoords() })
+                    .then(() => { this.cartCoords = { ...coords }; })
+                    .then(() => console.log(this.cartCoords));
 
-            return;
+                return;
+            }
+
         }
 
         this.cartCoords = getCoords();
@@ -322,6 +324,10 @@ class DragAndDrop {
         if (x > this.maxWidth) x = this.maxWidth - this.state.width;
         if (y > this.maxHeight) y = this.maxHeight - this.state.height;
 
+        if (x > this.cartCoords.left && x < this.cartCoords.right && y > this.cartCoords.top && y < this.cartCoords.bottom) {
+            console.log('in the cart!');
+        }
+
         this.state.x = x;
         this.state.y = y;
 
@@ -357,7 +363,7 @@ class DragAndDrop {
         this.bindEvents(this.isMobile);
         this.maxWidth = window.innerWidth;
         this.maxHeight = window.innerHeight;
-        this.getCartPosition();
+        this.getCartPosition(false);
     }
 
     bindEvents(isMobile) {
