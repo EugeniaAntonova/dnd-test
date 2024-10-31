@@ -41,6 +41,36 @@ body {
     background-color: #EDF6FF;
 }
 
+.button {
+    padding: 0;
+    color: #21201F;
+    font-weight: 500;
+    font-size: 1rem;
+    background-color: #FCE000;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+.button--restart {
+    width: 100px;
+    aspect-ratio: 1 / 1;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    scale: 0;
+    visibility: hidden;
+}
+
+.button--restart.shown {
+    visibility: visible;
+    scale: 1;
+}
+
+.button--restart.hidden {
+    scale: 0;
+    visibility: hidden;
+}
 .shop {
     width: 100%;
     max-width: 700px;
@@ -150,6 +180,7 @@ body {
     z-index: 4;
     display: grid;
     grid-template-rows: 1fr 96px;
+    pointer-events: none;
 }
 
 .checkout__cart {
@@ -159,29 +190,28 @@ body {
     overflow: hidden;
 }
 
+.checkout__cart.leave {
+    --offset: 150%;
+    opacity: 0;
+    translate: var(--offset) 0;
+}
+
 .cart__space {
     position: absolute;
     top: 0;
     left: 64px;
     right: 48px;
     bottom: 48px;
-    pointer-events: all;
 }
 
 .checkout__button {
+    padding: 1em 2em;
     place-self: center;
-    padding: 1.1em 1.2em;
-    color: #21201F;
-    font-weight: 500;
-    font-size: 1rem;
-    background-color: #FCE000;
-    border: none;
-    border-radius: 16px;
-    cursor: pointer;
 
     grid-column: 1 / -1;
     grid-row: 2 / -1;
     z-index: 2;
+    pointer-events: all;
 }
 
 .checkout__cart.empty+.checkout__button {
@@ -213,11 +243,37 @@ body {
     pointer-events: none;
 }
 
+.leave {
+    translate: 150vw;
+    opacity: 0;
+    transition: .0001s;
+}
+
 @media (prefers-reduced-motion: no-preference) {
+    .button--restart {
+        transition: .3s ease-in-out;
+    }
+
+    @media (hover: hover) {
+        .button--restart:is(:hover, :focus-visible):not(:active) svg {
+            rotate: -15deg;
+        }
+    }
+
+    .button--restart:active svg {
+        rotate: 360deg;
+    }
     .shelfes {
-        perspective: 1000px;
-        transform-style: preserve-3d;
         animation: showup .3s ease-in-out 1 forwards;
+    }
+
+    .shelfes.leave {
+        opacity: 1;
+        animation: out .3s ease-in 1 forwards;
+    }
+    .draggable.leave:not(.is-in-cart) {
+        translate: 0 -100vh;
+        transition: .5s ease-in-out;
     }
 
     .shelfes>*:not(.shelf:first-of-type) {
@@ -270,20 +326,26 @@ body {
         animation: rollIn var(--roll-in-time) ease-out 2.9s 1 forwards;
     }
 
-    .checkout__button {
+    .checkout.leave,
+    .draggable.leave.is-in-cart {
+        transition: .5s ease-in;
+        translate: 100vw 0;
+    }
+
+    .button {
         transition: .3s ease-in-out;
         transition-property: filter, scale, box-shadow;
     }
 
     @media (hover: hover) {
-        .checkout__button:where(:hover, :focus-visible) {
+        .button:where(:hover, :focus-visible) {
             scale: 1.05;
             filter: brightness(1.05);
             box-shadow: 0 0 10px rgb(33, 32, 31, .5);
         }
     }
 
-    .checkout__button:active {
+    .button:active {
         scale: .95;
         filter: brightness(.95);
         box-shadow: inset 0 0 10px rgb(33, 32, 31, .5);
@@ -306,6 +368,16 @@ body {
 
     to {
         translate: 0 0;
+    }
+}
+
+@keyframes out {
+    from {
+        translate: 0 0;
+    }    
+
+    to {
+        translate: 0 -100vh;
     }
 }
 
@@ -354,14 +426,20 @@ body {
         translate: var(--starting-offset) 0;
     }
 
-    25% {
-        opacity: 1;
-        translate: -75% 0;
-    }
-
     100% {
         opacity: 1;
         translate: 0 0;
+    }
+}
+@keyframes rollOut {
+    0% {
+        opacity: 1;
+        translate: 0 0;
+    }
+
+    100% {
+        opacity: 0;
+        translate: 100vw 0;
     }
 }
 
