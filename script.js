@@ -336,11 +336,6 @@ class DragAndDrop {
             target.style.setProperty('--left', `${x}px`);
             target.style.setProperty('--top', `${y}px`);
         });
-
-        if (x > this.cartCoords.left && (x + this.state.width - this.state.offsetX * 1.5) < this.cartCoords.right && y + target.clientHeight > this.cartCoords.top && y < this.cartCoords.bottom) {
-            console.log(this.state);
-            console.log(this.cartCoords);
-        }
     }
 
     onPointerUp() {
