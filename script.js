@@ -205,8 +205,6 @@ class DragAndDrop {
                 animationEnd()
                     .then(() => { coords = getCoords() })
                     .then(() => { this.cartCoords = { ...coords }; })
-                    .then(() => console.log(this.cartCoords));
-
                 return;
             }
 
@@ -308,34 +306,36 @@ class DragAndDrop {
     }
 
     onPointerMove(evt, touch) {
-        if (!this.state.isDragging) return;
-        let pageX = 0;
-        let pageY = 0;
-        if (touch) {
-            evt.preventDefault();
-            pageX = evt.touches[0].clientX;
-            pageY = evt.touches[0].clientY;
-        } else {
-            pageX = evt.pageX;
-            pageY = evt.pageY;
+        // if (!this.state.isDragging) return;
+        if (this.state.isDragging) {
+            let pageX = 0;
+            let pageY = 0;
+            if (touch) {
+                evt.preventDefault();
+                pageX = evt.touches[0].clientX;
+                pageY = evt.touches[0].clientY;
+            } else {
+                pageX = evt.pageX;
+                pageY = evt.pageY;
+            }
+    
+            const target = this.state.currentDraggingElement;
+    
+            let x = pageX - this.state.offsetX;
+            let y = pageY - this.state.offsetY;
+            if (x < 0) x = 0;
+            if (y < 0) y = 0;
+            if (x > this.maxWidth) x = this.maxWidth - this.state.width;
+            if (y > this.maxHeight) y = this.maxHeight - this.state.height;
+    
+            this.state.x = x;
+            this.state.y = y;
+    
+            requestAnimationFrame(() => {
+                target.style.setProperty('--left', `${x}px`);
+                target.style.setProperty('--top', `${y}px`);
+            });
         }
-
-        const target = this.state.currentDraggingElement;
-
-        let x = pageX - this.state.offsetX;
-        let y = pageY - this.state.offsetY;
-        if (x < 0) x = 0;
-        if (y < 0) y = 0;
-        if (x > this.maxWidth) x = this.maxWidth - this.state.width;
-        if (y > this.maxHeight) y = this.maxHeight - this.state.height;
-
-        this.state.x = x;
-        this.state.y = y;
-
-        requestAnimationFrame(() => {
-            target.style.setProperty('--left', `${x}px`);
-            target.style.setProperty('--top', `${y}px`);
-        });
     }
 
     onPointerUp() {
